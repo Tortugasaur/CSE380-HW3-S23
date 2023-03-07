@@ -5,11 +5,12 @@ import PlayerState from "./PlayerState";
 /**
  * The Dead state for the player's FSM AI. 
  */
-export default class Dead extends PlayerState {
+export default class Dying extends PlayerState {
 
     // Trigger the player's death animation when we enter the dead state
     public onEnter(options: Record<string, any>): void {
-        this.owner.animation.play(PlayerAnimations.DEAD);
+        this.owner.animation.play(PlayerAnimations.DYING);
+        this.owner.animation.queue(PlayerAnimations.DEAD, true, PlayerStates.DEAD);
     }
 
     // Ignore all events from the rest of the game

@@ -248,6 +248,7 @@ export default abstract class HW3Level extends Scene {
      * @param maxHealth the maximum health of the player
      */
     protected handleHealthChange(currentHealth: number, maxHealth: number): void {
+
 		let unit = this.healthBarBg.size.x / maxHealth;
         
 		this.healthBar.size.set(this.healthBarBg.size.x - unit * (maxHealth - currentHealth), this.healthBarBg.size.y);
@@ -403,7 +404,7 @@ export default abstract class HW3Level extends Scene {
 
         // Add the player to the scene
         this.player = this.add.animatedSprite(key, HW3Layers.PRIMARY);
-        this.player.scale.set(1, 1);
+        this.player.scale.set(1/8, 1/8);
         this.player.position.copy(this.playerSpawn);
         
         // Give the player physics
