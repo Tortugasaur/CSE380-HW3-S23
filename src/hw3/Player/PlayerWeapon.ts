@@ -1,5 +1,8 @@
+import Vec2 from "../../Wolfie2D/DataTypes/Vec2";
+import Input from "../../Wolfie2D/Input/Input";
 import Particle from "../../Wolfie2D/Nodes/Graphics/Particle";
 import ParticleSystem from "../../Wolfie2D/Rendering/Animations/ParticleSystem";
+import Timer from "../../Wolfie2D/Timing/Timer";
 import Color from "../../Wolfie2D/Utils/Color";
 import { EaseFunctionType } from "../../Wolfie2D/Utils/EaseFunctions";
 import RandUtils from "../../Wolfie2D/Utils/RandUtils";
@@ -28,8 +31,16 @@ export default class PlayerWeapon extends ParticleSystem {
      * @param particle the particle to give the animation to
      */
     public setParticleAnimation(particle: Particle) {
-        // Give the particle a random velocity.
-        particle.vel = RandUtils.randVec(100, 200, -32, 32);
+        let mouse = Input.getGlobalMousePosition();
+
+        // Calculate the direction vector from the particle to the mouse
+        let direction = new Vec2(mouse.x - particle.position.x, mouse.y - particle.position.y);
+    
+        // Set the desired speed of the particle
+        let speed = 200;
+    
+        // Normalize the direction vector and multiply it by the speed
+        particle.vel = direction.normalize().scale(speed);
         particle.color = Color.RED;
 
         // Give the particle tweens
