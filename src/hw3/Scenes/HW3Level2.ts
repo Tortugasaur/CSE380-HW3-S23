@@ -19,7 +19,7 @@ export default class Level2 extends HW3Level {
     public static readonly TILEMAP_KEY = "LEVEL2";
     public static readonly TILEMAP_PATH = "hw4_assets/tilemaps/HW4Level2.json";
     public static readonly TILEMAP_SCALE = new Vec2(2, 2);
-    public static readonly DESTRUCTIBLE_LAYER_KEY = "Destructable";
+    public static readonly DESTRUCTIBLE_LAYER_KEY = "Destructible";
     public static readonly WALLS_LAYER_KEY = "Main";
 
     public static readonly LEVEL_MUSIC_KEY = "LEVEL_MUSIC";

@@ -83,7 +83,7 @@ export default abstract class HW3Level extends Scene {
     /** The scale for the tilemap */
     protected tilemapScale: Vec2;
     /** The destrubtable layer of the tilemap */
-    protected destructable: OrthogonalTilemap;
+    protected destructible: OrthogonalTilemap;
     /** The wall layer of the tilemap */
     protected walls: OrthogonalTilemap;
 
@@ -95,6 +95,12 @@ export default abstract class HW3Level extends Scene {
     public constructor(viewport: Viewport, sceneManager: SceneManager, renderingManager: RenderingManager, options: Record<string, any>) {
         super(viewport, sceneManager, renderingManager, {...options, physics: {
             // TODO configure the collision groups and collision map
+            groupNames: ["Ground", "Player", "Weapon", "Destructible"],
+            collisions:
+            [ [0, 1, 1, 0],
+              [1, 0, 0, 1],
+              [1, 0, 0, 1],
+              [0, 1, 1, 0] ]
          }});
         this.add = new HW3FactoryManager(this, this.tilemaps);
     }
@@ -193,8 +199,8 @@ export default abstract class HW3Level extends Scene {
 
         let particle = particles.find(particle => particle.id === particleId);
         if (particle !== undefined) {
-            // Get the destructable tilemap
-            let tilemap = this.destructable;
+            // Get the destructible tilemap
+            let tilemap = this.destructible;
 
             let min = new Vec2(particle.sweptRect.left, particle.sweptRect.top);
             let max = new Vec2(particle.sweptRect.right, particle.sweptRect.bottom);
@@ -285,12 +291,15 @@ export default abstract class HW3Level extends Scene {
 
         // Get the wall and destructible layers 
         this.walls = this.getTilemap(this.wallsLayerKey) as OrthogonalTilemap;
-        this.destructable = this.getTilemap(this.destructibleLayerKey) as OrthogonalTilemap;
+        this.destructible = this.getTilemap(this.destructibleLayerKey) as OrthogonalTilemap;
 
         // Add physicss to the wall layer
         this.walls.addPhysics();
+        this.walls.setGroup("Ground");
         // Add physics to the destructible layer of the tilemap
-        this.destructable.addPhysics();
+        this.destructible.addPhysics();
+        this.destructible.setGroup("Destructible");
+
     }
     /**
      * Handles all subscriptions to events
@@ -408,6 +417,7 @@ export default abstract class HW3Level extends Scene {
         
         // Give the player physics
         this.player.addPhysics(new AABB(this.player.position.clone(), this.player.boundary.getHalfSize().clone()));
+        this.player.setGroup("Player");
 
         // TODO - give the player their flip tween
         this.player.tweens.add(PlayerTweens.FLIP, {
@@ -447,7 +457,7 @@ export default abstract class HW3Level extends Scene {
         // Give the player it's AI
         this.player.addAI(PlayerController, { 
             weaponSystem: this.playerWeaponSystem, 
-            tilemap: "Destructable" 
+            tilemap: "Destructible" 
         });
     }
     /**
@@ -470,7 +480,7 @@ export default abstract class HW3Level extends Scene {
         }
         
         this.levelEndArea = <Rect>this.add.graphic(GraphicType.RECT, HW3Layers.PRIMARY, { position: this.levelEndPosition, size: this.levelEndHalfSize });
-        this.levelEndArea.addPhysics(undefined, undefined, false, true);
+        this.levelEndArea.addPhysics(this.levelEndArea.collisionShape, undefined, false, true);
         this.levelEndArea.setTrigger(HW3PhysicsGroups.PLAYER, HW3Events.PLAYER_ENTERED_LEVEL_END, null);
         this.levelEndArea.color = new Color(255, 0, 255, .20);
         

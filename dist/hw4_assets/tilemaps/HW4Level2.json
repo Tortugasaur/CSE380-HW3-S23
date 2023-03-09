@@ -2069,7 +2069,7 @@
             ],
             "height": 32,
             "id": 2,
-            "name": "Destructable",
+            "name": "Destructible",
             "opacity": 1,
             "properties": [
                 {
@@ -2080,7 +2080,7 @@
                 {
                     "name": "Group",
                     "type": "string",
-                    "value": "DESTRUCTABLE"
+                    "value": "DESTRUCTIBLE"
                 }
             ],
             "type": "tilelayer",
