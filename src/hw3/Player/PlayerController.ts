@@ -27,7 +27,7 @@ import Attacking from "./PlayerStates/Attacking";
 export const PlayerAnimations = {
     IDLE: "IDLE",
     RUNNING_RIGHT: "RUNNING_RIGHT",
-    JUMP: "JUMP",
+    JUMP: "RUNNING_RIGHT",
     TAKING_DAMAGE: "TAKING_DAMAGE_RIGHT",
     DYING: "DYING_RIGHT",
     DEAD: "DEAD_RIGHT",
@@ -149,8 +149,10 @@ export default class PlayerController extends StateMachineAI {
         // When the health changes, fire an event up to the scene.
         this.emitter.fireEvent(HW3Events.HEALTH_CHANGE, {curhp: this.health, maxhp: this.maxHealth});
         // If the health hit 0, change the state of the player
-        if (this.health === 0) { setTimeout(() => {
+        if (this.health === 0) {{
+            setTimeout(() => {
             this.changeState(PlayerStates.DYING);
         }, 0);}
+        }
     }
 }
