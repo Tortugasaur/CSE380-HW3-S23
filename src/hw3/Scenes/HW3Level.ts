@@ -216,6 +216,7 @@ export default abstract class HW3Level extends Scene {
                     if(tilemap.isTileCollidable(col, row) && this.particleHitTile(tilemap, particle, col, row)){
                         this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: this.tileDestroyedAudioKey, loop: false, holdReference: false });
                         // TODO Destroy the tile
+                        //tilemap
                     }
                 }
             }
@@ -295,10 +296,8 @@ export default abstract class HW3Level extends Scene {
 
         // Add physicss to the wall layer
         this.walls.addPhysics();
-        this.walls.setGroup("Ground");
         // Add physics to the destructible layer of the tilemap
         this.destructible.addPhysics();
-        this.destructible.setGroup("Destructible");
 
     }
     /**
