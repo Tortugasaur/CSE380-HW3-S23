@@ -1,3 +1,5 @@
+import { HW3Events } from "../../../hw3/HW3Events";
+import { HW3PhysicsGroups } from "../../../hw3/HW3PhysicsGroups";
 import Updateable from "../../DataTypes/Interfaces/Updateable";
 import Vec2 from "../../DataTypes/Vec2";
 import { GraphicType } from "../../Nodes/Graphics/GraphicTypes";
@@ -64,8 +66,8 @@ export default class ParticleSystem implements Updateable {
         for (let i = 0; i < this.particlePool.length; i++) {
             this.particlePool[i] = <Particle>scene.add.graphic(GraphicType.PARTICLE, layer,
                 { position: this.sourcePoint.clone(), size: this.particleSize.clone(), mass: this.particleMass });
-            this.particlePool[i].addPhysics();
-            this.particlePool[i].setGroup("Weapon");
+            this.particlePool[i].addPhysics(this.particlePool[i].collisionShape);
+            this.particlePool[i].setGroup(HW3PhysicsGroups.PLAYER_WEAPON);
             this.particlePool[i].isCollidable = false;
             this.particlePool[i].visible = false;
         }

@@ -80,7 +80,7 @@ export default class Level1 extends HW3Level {
      * Unload resources for level 1
      */
     public unloadScene(): void {
-        // TODO decide which resources to keep/cull 
+        // TODO decide which resources to keep/cull
     }
 
     public startScene(): void {

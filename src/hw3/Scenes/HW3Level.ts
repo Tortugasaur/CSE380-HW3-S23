@@ -25,6 +25,8 @@ import { HW3PhysicsGroups } from "../HW3PhysicsGroups";
 import HW3FactoryManager from "../Factory/HW3FactoryManager";
 import MainMenu from "./MainMenu";
 import Particle from "../../Wolfie2D/Nodes/Graphics/Particle";
+import ParticleSystem from "../../Wolfie2D/Rendering/Animations/ParticleSystem";
+import ParticleSystemManager from "../../Wolfie2D/Rendering/Animations/ParticleSystemManager";
 
 /**
  * A const object for the layer names
@@ -96,7 +98,10 @@ export default abstract class HW3Level extends Scene {
     public constructor(viewport: Viewport, sceneManager: SceneManager, renderingManager: RenderingManager, options: Record<string, any>) {
         super(viewport, sceneManager, renderingManager, {...options, physics: {
             // TODO configure the collision groups and collision map
-            groupNames: ["Ground", "Player", "Weapon", "Destructible"],
+            groupNames: [HW3PhysicsGroups.GROUND, 
+                HW3PhysicsGroups.PLAYER, 
+                HW3PhysicsGroups.PLAYER_WEAPON, 
+                HW3PhysicsGroups.DESTRUCTIBLE],
             collisions:
             [ [0, 1, 1, 0],
               [1, 0, 0, 1],
@@ -184,6 +189,12 @@ export default abstract class HW3Level extends Scene {
                 this.sceneManager.changeToScene(MainMenu);
                 break;
             }
+            case HW3Events.TILE_HIT: {
+                //this.emitter.fireEvent(GameEventType.PLAY_SOUND, {key: "DEAD_MUSIC", loop: false, holdReference: true});
+                console.log(event.data.get("other")+" and "+event.data.get("node"));
+                this.handleParticleHit(event.data.get("node"));
+                break;
+            }
             // Default: Throw an error! No unhandled events allowed.
             default: {
                 throw new Error(`Unhandled event caught in scene with type ${event.type}`)
@@ -216,10 +227,14 @@ export default abstract class HW3Level extends Scene {
             for(let col = minIndex.x; col <= maxIndex.x; col++){
                 for(let row = minIndex.y; row <= maxIndex.y; row++){
                     // If the tile is collideable -> check if this particle is colliding with the tile
+                    console.log(tilemap.isTileCollidable(col, row)+" "+this.particleHitTile(tilemap, particle, col, row))
                     if(tilemap.isTileCollidable(col, row) && this.particleHitTile(tilemap, particle, col, row)){
-                        this.player.animation.play("DEAD");
-                        this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: this.tileDestroyedAudioKey, loop: false, holdReference: false });
+                        this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: this.tileDestroyedAudioKey, loop: false, holdReference: false});
                         // TODO Destroy the tile
+                        let tileCoords = new Vec2();
+                        tileCoords.x = col;
+                        tileCoords.y = row;
+                        tilemap.setTileAtRowCol(tileCoords, 0);
                     }
                 }
             }
@@ -239,7 +254,15 @@ export default abstract class HW3Level extends Scene {
         // TODO detect whether a particle hit a tile
         let tileAABB = tilemap.boundary;
         let particleAABB = particle.boundary;
-        return tileAABB.touchesAABB(particleAABB) != null;
+
+        if (particleAABB.right < tileAABB.left || particleAABB.left > tileAABB.right || 
+            particleAABB.bottom < tileAABB.top || particleAABB.top > tileAABB.bottom) {
+            // the particle and tile do not intersect, so there is no collision
+            return false;
+        } else {
+            // the particle and tile intersect, so there is a collision
+            return true;
+        }
     }
 
     /**
@@ -300,11 +323,12 @@ export default abstract class HW3Level extends Scene {
         this.walls = this.getTilemap(this.wallsLayerKey) as OrthogonalTilemap;
         this.destructible = this.getTilemap(this.destructibleLayerKey) as OrthogonalTilemap;
 
-        // Add physicss to the wall layer
+        // Add physics to the wall layer
         this.walls.addPhysics();
         // Add physics to the destructible layer of the tilemap
         this.destructible.addPhysics();
-        this.destructible.isCollidable = true;
+        this.destructible.setGroup(HW3PhysicsGroups.DESTRUCTIBLE);
+        this.destructible.setTrigger(HW3PhysicsGroups.PLAYER_WEAPON, HW3Events.TILE_HIT, null);
     }
     /**
      * Handles all subscriptions to events
@@ -315,6 +339,7 @@ export default abstract class HW3Level extends Scene {
         this.receiver.subscribe(HW3Events.LEVEL_END);
         this.receiver.subscribe(HW3Events.HEALTH_CHANGE);
         this.receiver.subscribe(HW3Events.PLAYER_DEAD);
+        this.receiver.subscribe(HW3Events.TILE_HIT);
     }
     /**
      * Adds in any necessary UI to the game
@@ -422,7 +447,7 @@ export default abstract class HW3Level extends Scene {
         
         // Give the player physics
         this.player.addPhysics(new AABB(this.player.position.clone(), this.player.boundary.getHalfSize().clone()));
-        this.player.setGroup("Player");
+        this.player.setGroup(HW3PhysicsGroups.PLAYER);
 
         // TODO - give the player their flip tween
         this.player.tweens.add(PlayerTweens.FLIP, {
@@ -485,6 +510,7 @@ export default abstract class HW3Level extends Scene {
         }
         
         this.levelEndArea = <Rect>this.add.graphic(GraphicType.RECT, HW3Layers.PRIMARY, { position: this.levelEndPosition, size: this.levelEndHalfSize });
+        this.levelEndArea.setColor(new Color(0, 0, 0));
         this.levelEndArea.addPhysics(this.levelEndArea.collisionShape, undefined, false, true);
         this.levelEndArea.setTrigger(HW3PhysicsGroups.PLAYER, HW3Events.PLAYER_ENTERED_LEVEL_END, null);
         this.levelEndArea.color = new Color(255, 0, 255, .20);
