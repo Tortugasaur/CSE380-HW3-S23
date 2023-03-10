@@ -18,6 +18,7 @@ import Walk from "./PlayerStates/Walk";
 import TakingDamage from "./PlayerStates/TakingDamage";
 import Dying from "./PlayerStates/Dying";
 import Attacking from "./PlayerStates/Attacking";
+import { GameEventType } from "../../Wolfie2D/Events/GameEventType";
 
 // TODO play your heros animations
 
@@ -149,10 +150,11 @@ export default class PlayerController extends StateMachineAI {
         // When the health changes, fire an event up to the scene.
         this.emitter.fireEvent(HW3Events.HEALTH_CHANGE, {curhp: this.health, maxhp: this.maxHealth});
         // If the health hit 0, change the state of the player
-        if (this.health === 0) {{
+        if (this.health === 0) {
             setTimeout(() => {
-            this.changeState(PlayerStates.DYING);
-        }, 0);}
+                this.emitter.fireEvent(GameEventType.PLAY_SOUND, {key: "DEAD_MUSIC", loop: false, holdReference: true});
+                this.changeState(PlayerStates.DYING)
+            }, 0);
         }
     }
 }

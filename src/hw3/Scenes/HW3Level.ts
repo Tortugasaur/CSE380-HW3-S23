@@ -91,6 +91,7 @@ export default abstract class HW3Level extends Scene {
     protected levelMusicKey: string;
     protected jumpAudioKey: string;
     protected tileDestroyedAudioKey: string;
+    protected playerDeadAudioKey: string;
 
     public constructor(viewport: Viewport, sceneManager: SceneManager, renderingManager: RenderingManager, options: Record<string, any>) {
         super(viewport, sceneManager, renderingManager, {...options, physics: {
@@ -170,6 +171,7 @@ export default abstract class HW3Level extends Scene {
             }
             // When the level ends, change the scene to the next level
             case HW3Events.LEVEL_END: {
+                this.emitter.fireEvent(GameEventType.STOP_SOUND, {key: this.levelMusicKey, loop: false, holdReference: false});
                 this.sceneManager.changeToScene(this.nextLevel);
                 break;
             }
@@ -178,6 +180,7 @@ export default abstract class HW3Level extends Scene {
                 break;
             }
             case HW3Events.PLAYER_DEAD: {
+                this.emitter.fireEvent(GameEventType.STOP_SOUND, {key: this.levelMusicKey, loop: false, holdReference: false});
                 this.sceneManager.changeToScene(MainMenu);
                 break;
             }
@@ -214,9 +217,9 @@ export default abstract class HW3Level extends Scene {
                 for(let row = minIndex.y; row <= maxIndex.y; row++){
                     // If the tile is collideable -> check if this particle is colliding with the tile
                     if(tilemap.isTileCollidable(col, row) && this.particleHitTile(tilemap, particle, col, row)){
+                        this.player.animation.play("DEAD");
                         this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: this.tileDestroyedAudioKey, loop: false, holdReference: false });
                         // TODO Destroy the tile
-                        //tilemap
                     }
                 }
             }
@@ -234,13 +237,16 @@ export default abstract class HW3Level extends Scene {
      */
     protected particleHitTile(tilemap: OrthogonalTilemap, particle: Particle, col: number, row: number): boolean {
         // TODO detect whether a particle hit a tile
-        return;
+        let tileAABB = tilemap.boundary;
+        let particleAABB = particle.boundary;
+        return tileAABB.touchesAABB(particleAABB) != null;
     }
 
     /**
      * Handle the event when the player enters the level end area.
      */
     protected handleEnteredLevelEnd(): void {
+        this.emitter.fireEvent(GameEventType.STOP_SOUND, {key: this.levelMusicKey, loop: true, holdReference: true});
         // If the timer hasn't run yet, start the end level animation
         if (!this.levelEndTimer.hasRun() && this.levelEndTimer.isStopped()) {
             this.levelEndTimer.start();
@@ -298,7 +304,7 @@ export default abstract class HW3Level extends Scene {
         this.walls.addPhysics();
         // Add physics to the destructible layer of the tilemap
         this.destructible.addPhysics();
-
+        this.destructible.isCollidable = true;
     }
     /**
      * Handles all subscriptions to events

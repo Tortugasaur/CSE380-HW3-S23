@@ -31,6 +31,9 @@ export default class Level2 extends HW3Level {
     public static readonly TILE_DESTROYED_KEY = "TILE_DESTROYED";
     public static readonly TILE_DESTROYED_PATH = "hw4_assets/sounds/switch.wav";
 
+    public static readonly PLAYER_DEAD_KEY = "DEAD_MUSIC";
+    public static readonly PLAYER_DEAD_PATH = "hw4_assets/sounds/Marine_Death05.wav";
+
     public static readonly LEVEL_END = new AABB(new Vec2(224, 232), new Vec2(24, 16));
 
     public constructor(viewport: Viewport, sceneManager: SceneManager, renderingManager: RenderingManager, options: Record<string, any>) {
@@ -69,6 +72,8 @@ export default class Level2 extends HW3Level {
         this.load.audio(this.levelMusicKey, Level2.LEVEL_MUSIC_PATH);
         this.load.audio(this.jumpAudioKey, Level2.JUMP_AUDIO_PATH);
         this.load.audio(this.tileDestroyedAudioKey, Level2.TILE_DESTROYED_PATH);
+
+        this.load.audio(this.playerDeadAudioKey, Level2.PLAYER_DEAD_PATH);
     }
 
     public unloadScene(): void {

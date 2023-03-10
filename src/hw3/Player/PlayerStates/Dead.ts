@@ -1,4 +1,5 @@
 import GameEvent from "../../../Wolfie2D/Events/GameEvent";
+import { GameEventType } from "../../../Wolfie2D/Events/GameEventType";
 import { HW3Events } from "../../HW3Events";
 import { PlayerAnimations, PlayerStates, PlayerTweens } from "../PlayerController";
 import PlayerState from "./PlayerState";
@@ -10,8 +11,6 @@ export default class Dead extends PlayerState {
 
     // Trigger the player's death animation when we enter the dead state
     public onEnter(options: Record<string, any>): void {
-        //this.owner.tweens.play(PlayerTweens.DEATH);
-        this.owner.animation.play(PlayerAnimations.DEAD);
         this.emitter.fireEvent(HW3Events.PLAYER_DEAD);
     }
 
