@@ -190,8 +190,6 @@ export default abstract class HW3Level extends Scene {
                 break;
             }
             case HW3Events.TILE_HIT: {
-                //this.emitter.fireEvent(GameEventType.PLAY_SOUND, {key: "DEAD_MUSIC", loop: false, holdReference: true});
-                console.log(event.data.get("other")+" and "+event.data.get("node"));
                 this.handleParticleHit(event.data.get("node"));
                 break;
             }
@@ -227,7 +225,6 @@ export default abstract class HW3Level extends Scene {
             for(let col = minIndex.x; col <= maxIndex.x; col++){
                 for(let row = minIndex.y; row <= maxIndex.y; row++){
                     // If the tile is collideable -> check if this particle is colliding with the tile
-                    console.log(tilemap.isTileCollidable(col, row)+" "+this.particleHitTile(tilemap, particle, col, row))
                     if(tilemap.isTileCollidable(col, row) && this.particleHitTile(tilemap, particle, col, row)){
                         this.emitter.fireEvent(GameEventType.PLAY_SOUND, { key: this.tileDestroyedAudioKey, loop: false, holdReference: false});
                         // TODO Destroy the tile
