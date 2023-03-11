@@ -25,8 +25,6 @@ import { HW3PhysicsGroups } from "../HW3PhysicsGroups";
 import HW3FactoryManager from "../Factory/HW3FactoryManager";
 import MainMenu from "./MainMenu";
 import Particle from "../../Wolfie2D/Nodes/Graphics/Particle";
-import ParticleSystem from "../../Wolfie2D/Rendering/Animations/ParticleSystem";
-import ParticleSystemManager from "../../Wolfie2D/Rendering/Animations/ParticleSystemManager";
 
 /**
  * A const object for the layer names

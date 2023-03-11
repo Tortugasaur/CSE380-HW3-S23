@@ -2,7 +2,6 @@ import Vec2 from "../../Wolfie2D/DataTypes/Vec2";
 import Input from "../../Wolfie2D/Input/Input";
 import Particle from "../../Wolfie2D/Nodes/Graphics/Particle";
 import ParticleSystem from "../../Wolfie2D/Rendering/Animations/ParticleSystem";
-import Timer from "../../Wolfie2D/Timing/Timer";
 import Color from "../../Wolfie2D/Utils/Color";
 import { EaseFunctionType } from "../../Wolfie2D/Utils/EaseFunctions";
 import RandUtils from "../../Wolfie2D/Utils/RandUtils";
@@ -32,29 +31,25 @@ export default class PlayerWeapon extends ParticleSystem {
      */
     public setParticleAnimation(particle: Particle) {
         let mouse = Input.getGlobalMousePosition();
-
-        // Calculate the direction vector from the particle to the mouse
-        let direction = new Vec2(mouse.x - particle.position.x, mouse.y - particle.position.y);
-    
-        // Set the desired speed of the particle
-        let speed = 200;
-    
-        // Normalize the direction vector and multiply it by the speed
-        particle.vel = direction.normalize().scale(speed);
-        particle.color = Color.RED;
-
+        let direction = mouse.sub(particle.position).normalize();
+        let velocity = direction.scale(RandUtils.randInt(100, 200));
+        
+        velocity = velocity.add(new Vec2(RandUtils.randInt(-32, 32), RandUtils.randInt(-32, 32)));
+        
+        particle.vel = velocity;
+        
         // Give the particle tweens
         particle.tweens.add("active", {
-            startDelay: 0,
-            duration: this.lifetime,
-            effects: [
-                {
-                    property: "alpha",
-                    start: 1,
-                    end: 0,
-                    ease: EaseFunctionType.IN_OUT_SINE
-                }
-            ]
+          startDelay: 0,
+          duration: this.lifetime,
+          effects: [
+            {
+              property: "alpha",
+              start: 1,
+              end: 0,
+              ease: EaseFunctionType.IN_OUT_SINE
+            }
+          ]
         });
     }
 
